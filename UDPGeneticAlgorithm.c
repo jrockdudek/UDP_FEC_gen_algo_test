@@ -39,18 +39,18 @@ int main() {
 	Scheme children[POP_SIZE]; //An array that holds the children created from recombination
 	Scheme population[POP_SIZE]; //The array of the population
 	FILE* logFile;
-	
+
 	port = 0;
 	portLoops = 0;
-	
+
 	initializePopulation(population);
 	for(i = 1; i <= MAX_GEN; i++) {
-	
+
 		//Resets the min, max and avg fit for each generation
 		minFit = INT_MAX;
 		maxFit = INT_MIN;
 		avgFit = 0;
-		
+
 		//Evaluation of fitness for each chromosome
 		evaluateFitness(population);
 		for(j = 0; j < POP_SIZE; j++) {
@@ -60,42 +60,40 @@ int main() {
 			if(fitness[j] > maxFit)
 				maxFit = fitness[j];
 			avgFit += fitness[j];
-				
+
 			//Sets the new best overall fitness to beat
 			if(fitness[j] > bestFit) {
 				bestFit = fitness[j];
 				bestGen = i;
-				
+
 				copyScheme(&bestScheme, &population[j]);
 			}
 		}
 		avgFit /= POP_SIZE;
 		//Prints stuff out every so many generations
 		if((i % 1) == 0) {
-		
+
 			logFile = fopen("logFile.txt", "a");
 			if(logFile == NULL) {
 				printf("Error opening file.\n");
 				return 0;
 			}
-		
+
 			fprintf(logFile, "Generation %i\n", i);
-			fprintf(logFile, "minFit: %i\nmaxFit: %i\navgFit: %i\n\n", minFit, maxFit, avgFit);		
-		
+			fprintf(logFile, "minFit: %i\nmaxFit: %i\navgFit: %i\n\n", minFit, maxFit, avgFit);
+
 			for(j = 0; j < POP_SIZE; j++) {
 				fprintf(logFile, "Chrom: %i\nFitness: %i\n", j, fitness[j]);
 				fprintScheme(logFile, &population[j]);
 				fprintf(logFile, "\n");
-				
 			}
 			fprintf(logFile,"\n\n");
 			close(logFile);
-		
+
 			//Prints the fitness stats for the current generation
 			printf("Generation %i\n", i);
 			printf("minFit: %i\nmaxFit: %i\navgFit: %i\n\n", minFit, maxFit, avgFit);
-			
-			
+
 			//Prints out every scheme in the population along with it's fitness
 			/*
 			printf("\nGeneration %i:\n\n", i);
@@ -226,7 +224,7 @@ void evaluateFitness(Scheme* population) {
 		result = evaluateScheme((void*)data);
 		sleep(1);
 		if(result == 0) {
-			sleep(5);
+			//sleep(5);
 			i--;
 			port++;
 			//printf("Current port: %i\n". (FIRST_PORT + port));
@@ -260,7 +258,6 @@ void evaluateFitness(Scheme* population) {
 	*/
 }
 
-//Where all the networking magic happens
 int evaluateScheme(void* arg) {
 	TestScheme_t* data = (TestScheme_t*)arg;
 	//fitness[data->schemeNum] = 0;
@@ -294,18 +291,19 @@ int evaluateScheme(void* arg) {
 		free(data);
 		return 0;
 	}
-	
+
 	addrUDP.sin_family = AF_INET;
-	addrUDP.sin_addr.s_addr = inet_addr(AWS_ADDR);	
+
+	addrUDP.sin_addr.s_addr = inet_addr(SERV_ADDR);
 	addrUDP.sin_port = htons(FIRST_PORT + data->portToUse);
 	lenUDP = sizeof(addrUDP);
 
 	addrTCP.sin_family = AF_INET;
-	addrTCP.sin_addr.s_addr = inet_addr(AWS_ADDR);	
+	addrTCP.sin_addr.s_addr = inet_addr(SERV_ADDR);
 	addrTCP.sin_port = htons(FIRST_PORT + data->portToUse);
 	lenTCP = sizeof(addrTCP);
-	
-	
+
+
 	ret = connect(sockfdTCP, (struct sockaddr*)&addrTCP, lenTCP);
 	if(ret == -1) {
 		perror(strerror(errno));

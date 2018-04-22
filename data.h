@@ -3,7 +3,7 @@
 #define pc 0.85
 #define pm 0.1
 #define FIRST_PORT 3001
-#define AWS_ADDR "10.0.14.130"
+#define SERV_ADDR "127.0.0.1"
 #define NUM_OF_SIZES 4
 #define NUM_OF_ORDERS 3
 #define numOfThreadsAtOnce  1
@@ -12,15 +12,13 @@
 
 const int DATA_SIZES[] = {960, 1920, 3840, 7680, 9600, 19200};
 						  //5ms, 10ms, 20ms, 40ms, 50ms, 100ms
-						  
+
 const int TIME_FOR_SIZES[] = {5, 10, 20, 40, 50, 100}; //All in milliseconds
 
 typedef struct Scheme {
 	int size;  //Size of the packet. Must be from DATA_SIZES
 	int order; //Order in which the duplicates are sent
-							//STILL HAVE TO DECIDE POSSIBLE ORDERS
 	int delayTilDuplicate; //Percentage delay(0 to 100)
-	
 } Scheme;
 
 typedef struct TestScheme_t {
